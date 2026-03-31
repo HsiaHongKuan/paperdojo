@@ -178,18 +178,21 @@ prompt: |
 
   CRITICAL: Do NOT include anything about the authors' solution or approach. Truncate at any "we show", "we propose", "we prove", "in this paper, we", "our approach", "our method", or similar solution-hinting language.
 
-  Return a detailed yet precise problem statement.
+  Return a thorough overview — this is the user's main window into the paper before deciding to coach. Be detailed and precise, not terse. Adapt to the paper's nature:
+  - If the paper has a clear problem/gap: cover the setting in detail, the specific gap, why it's hard (what makes naive approaches fail), what's known so far, and key prior results
+  - If not (review, experimental report, benchmark): cover the context, what they do, key findings, and significance
+
+  Each bullet point should be a full sentence or two, not a fragment.
 ```
 
-Present the subagent's output in a Unicode box using box-drawing characters (┌─┐│└─┘). You are a coach preparing the user to think about this problem — present it as a challenge, not a summary. Use bullet points for structure. Example format:
+Present the subagent's output in a Unicode box titled "Overview" using box-drawing characters (┌─┐│└─┘). Bold key terms. Use bullet points for structure:
 
 ```
-┌─ Problem Description ──────────────────────────────
+┌─ Overview ────────────────────────────────────────
 │
-│ - Background concept and why it matters
-│ - The specific problem: what is unknown or missing
-│ - Why it's hard: what makes naive approaches fail
-│ - What's at stake: why solving this would be valuable
+│ - ...detailed point...
+│ - ...detailed point...
+│ - ...detailed point...
 │
 └────────────────────────────────────────────────────
 ```
