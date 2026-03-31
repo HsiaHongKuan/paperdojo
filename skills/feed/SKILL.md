@@ -166,17 +166,22 @@ description: "Fetch paper intro details"
 prompt: |
   Fetch the full content of arxiv paper {arxiv_id} using the arxiv-latex-mcp tool `get_paper_prompt`. Use ONE call — do not use list_paper_sections or get_paper_section.
 
-  From the returned content, find the introduction (may be labeled "Introduction", "I. Introduction", or use inline markers like "Introduction.---"). Extract:
-  - The problem being studied and its motivation
-  - Key background concepts needed to understand the problem
-  - What makes this problem hard or important
+  The user's background: {paste [user] section from interests.toml, or "not specified"}
+
+  From the returned content, find the introduction and problem setup (may be labeled "Introduction", "I. Introduction", or use inline markers like "Introduction.---"). Extract a SOLVABLE PROBLEM STATEMENT — not a paper summary, but enough context for someone to start forming their own approach. Include:
+  - The specific setup and constraints (e.g., what system, what regime, finite or infinite, what assumptions)
+  - The precise question or gap: what exactly is unknown, unproven, or unsolved
+  - Why naive approaches fail or why this is non-trivial
+  - Any key prior results that frame the problem
+
+  Calibrate the level of detail to the user's background — skip definitions they'd know, but include specifics they'd need to think about the problem.
 
   CRITICAL: Do NOT include anything about the authors' solution or approach. Truncate at any "we show", "we propose", "we prove", "in this paper, we", "our approach", "our method", or similar solution-hinting language.
 
-  Return a concise problem description (3-5 paragraphs).
+  Return a detailed yet precise problem statement.
 ```
 
-Present the subagent's output in a Unicode box using box-drawing characters (┌─┐│└─┘). The description should be detailed yet precise — you are a coach preparing the user to think about this problem. Cover the key concepts, why the problem matters, and what makes it hard. Use bullet points for structure. Example format:
+Present the subagent's output in a Unicode box using box-drawing characters (┌─┐│└─┘). You are a coach preparing the user to think about this problem — present it as a challenge, not a summary. Use bullet points for structure. Example format:
 
 ```
 ┌─ Problem Description ──────────────────────────────
