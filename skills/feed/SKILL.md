@@ -9,15 +9,12 @@ description: Daily arxiv paper feed — fetches and ranks papers by relevance to
 
 Read `.paperdojo/interests.toml`.
 
-**If missing or has no `[interests.*]` sections:** ask the user inline:
+**If missing or has no `[interests.*]` sections:** run a lightweight inline setup (same interactive style as `/setup`, skip coaching preferences — use defaults):
 
-> What arxiv categories are you interested in? (e.g., quant-ph, cs.AI, cs.DS)
-
-Then for each category:
-
-> For **[category]**: what specific topics and focus? (e.g., topics: "quantum error correction", focus: "threshold results")
-
-Write `.paperdojo/interests.toml` with the answers (use defaults for `[coaching]` section). Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
+1. Ask what they work on or care about, in their own words. Be warm and humorous — they came for papers, not a form.
+2. Map their description to arxiv categories. Present as a table with full names and why each matches. Let them adjust.
+3. For each category, ask about specific topics and focus. Show a playful non-real example for the format. Focus is optional.
+4. Write `.paperdojo/interests.toml` with defaults for `[coaching]`. Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
 
 Then continue to Step 2.
 

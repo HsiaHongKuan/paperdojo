@@ -16,31 +16,19 @@ Read `.paperdojo/interests.toml`.
 
 Walk the user through setup one question at a time.
 
-### Step 1: Research categories
+### Step 1: Research interests (freeform)
 
-Ask the user which arxiv categories they follow. Present common examples for reference:
+Ask the user what they work on or care about, in their own words. Be warm and a bit humorous — this is a first date with their paper coach. Do NOT list arxiv category codes or assume the user knows them.
 
-```
-Common arxiv categories:
-  Physics: quant-ph, cond-mat, hep-th, gr-qc
-  CS: cs.AI, cs.DS, cs.LG, cs.CL, cs.CC
-  Math: math.CO, math-ph, math.QA
-  Other: stat.ML, eess.SP
+### Step 2: Map to arxiv categories
 
-Full list: https://arxiv.org/category_taxonomy
+Based on the user's description, suggest relevant arxiv categories. Present as a table with the full category name and a brief reason why it matches. Ask if they want to add or remove any.
 
-What arxiv categories are you interested in?
-```
+### Step 3: Topics and focus (per category)
 
-### Step 2: Topics and focus (per category)
+For each confirmed category, ask what specific topics interest them and what angle they care about. Use **bold** for category names and `code` for arxiv codes to make the output scannable. Illustrate the format with a playful, obviously-not-real example (e.g., topics: "time-traveling qubits", focus: "ones that arrive before they leave"). Focus is optional — don't push if the user doesn't have one.
 
-For each category the user provided, ask:
-
-> For **[category]**: what specific topics are you interested in, and what's your focus? (e.g., topics: "quantum error correction, topological codes", focus: "new code constructions and threshold results")
-
-The user can answer both in one message or separately. If they give only topics without a focus, that's fine — focus is optional.
-
-### Step 3: Coaching preferences
+### Step 4: Coaching preferences
 
 Ask:
 
@@ -50,7 +38,7 @@ Ask:
 >
 > Press enter to accept defaults, or specify your preferences.
 
-### Step 4: Write config
+### Step 5: Write config
 
 Create `.paperdojo/` directory structure and write `interests.toml`:
 
@@ -67,7 +55,7 @@ focus = "<user_focus>"
 Use the Write tool to create `.paperdojo/interests.toml`.
 Use Bash to create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
 
-### Step 5: MCP server check
+### Step 6: MCP server check
 
 Check if `arxiv-latex-mcp` is available by attempting to use one of its tools.
 
