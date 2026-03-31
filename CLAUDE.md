@@ -8,7 +8,7 @@ A skill-based plugin for AI coding assistants. Daily thinking exercise built on 
 |---|---|
 | `/setup` | Configure research interests, coaching preferences, MCP servers |
 | `/feed` | Daily paper browsing with ranked recommendations |
-| `/coach` | Socratic coaching session for a specific paper (not yet implemented) |
+| `/coach` | Socratic coaching session — work through a paper's problem with guided hints |
 | `/report` | Historical dashboard from past sessions (not yet implemented) |
 
 ## Key Files
