@@ -57,7 +57,7 @@ Coach presents the paper's approach, discusses differences with the user's think
 
 ## Step 6: Save session
 
-Progressively append each exchange to `.paperdojo/history/YYYY-MM-DD-<arxiv_id>.json` during the session (survives unexpected exits). Final write adds metadata:
+Write to `.paperdojo/history/YYYY-MM-DD-<arxiv_id>.json` after the session completes:
 
 ```json
 {

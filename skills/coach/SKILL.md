@@ -9,19 +9,28 @@ description: Use when the user wants to work through an arxiv paper's problem wi
 
 You are an intellectual sparring partner — warm, encouraging, genuinely curious about the user's thinking. Celebrate good ideas, gently redirect dead ends, never condescend.
 
+## Entry
+
+The user provides an arxiv ID — either directly (`/coach 2603.28349`) or via `/feed` pressing `[s]`.
+
+- **From `/feed`**: the conversation already has feed context. Source is `"feed"`. If `[d]` details were viewed, build on that description.
+- **Direct**: no feed context. Source is `"direct"`.
+
 ## Step 1: Read paper
 
 Read the user's background from `.paperdojo/interests.toml` (if exists) for calibration.
 
 Read the paper via `arxiv-latex-mcp` (`get_paper_prompt`). Disregard references, appendices, and supplementary material — only the main body matters.
 
-**Fallback:** If LaTeX source unavailable, use `arxiv-mcp-server`'s `download_paper` (PDF → markdown). If neither MCP is available, prompt just-in-time install:
+**Fallback:** If LaTeX source unavailable or garbled, use `arxiv-mcp-server`'s `download_paper` (PDF → markdown). If neither MCP is available, prompt just-in-time install:
 ```bash
 python3 -m venv .paperdojo/venv
 .paperdojo/venv/bin/pip install arxiv-latex-mcp arxiv-mcp-server
 claude mcp add -s project arxiv-latex-mcp -- .paperdojo/venv/bin/python -m arxiv_latex_mcp
 claude mcp add -s project arxiv-mcp-server -- .paperdojo/venv/bin/python -m arxiv_mcp_server
 ```
+
+After fetching, briefly announce: "Coaching: *{title}*. Let's go." — gives the user a chance to catch a wrong ID before the heavy setup.
 
 ## Step 2: Assess suitability
 
@@ -109,4 +118,4 @@ Create `.paperdojo/history/` directory if needed. Write to `.paperdojo/history/Y
 - `outcome`: `"solved"` if user arrived at the solution, `"revealed"` if user asked to see it
 - `conversation`: reconstruct the coaching conversation (problem presentation, user's attempts, hints given, reveal)
 
-After saving, briefly summarize: what went well, what concepts to revisit. End warmly.
+After saving, briefly summarize: what went well, what concepts to revisit. Let the user know that to browse more papers, start a fresh `/feed` session. End warmly.
