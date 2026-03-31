@@ -3,6 +3,10 @@
     "arxiv-latex-mcp": {
       "command": ".paperdojo/venv/bin/python",
       "args": ["-m", "arxiv_latex_mcp"]
+    },
+    "arxiv-mcp-server": {
+      "command": ".paperdojo/venv/bin/python",
+      "args": ["-m", "arxiv_mcp_server"]
     }
   }
 }

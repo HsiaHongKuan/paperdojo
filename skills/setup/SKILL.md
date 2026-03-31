@@ -85,18 +85,19 @@ Check if `arxiv-latex-mcp` is available by attempting to use one of its tools.
 
 > arxiv-latex-mcp is needed for viewing paper details and coaching sessions. Install now? [y/n]
 
-If yes, create a local venv and install:
+If yes, create a local venv and install both MCP servers:
 ```bash
 python3 -m venv .paperdojo/venv
-.paperdojo/venv/bin/pip install arxiv-latex-mcp
+.paperdojo/venv/bin/pip install arxiv-latex-mcp arxiv-mcp-server
 ```
 
 Then register via Claude Code CLI:
 ```bash
 claude mcp add -s project arxiv-latex-mcp -- .paperdojo/venv/bin/python -m arxiv_latex_mcp
+claude mcp add -s project arxiv-mcp-server -- .paperdojo/venv/bin/python -m arxiv_mcp_server
 ```
 
-Report setup complete. Summarize what was configured.
+Present a config summary table (categories, topics, focus, coaching style), then close as a coach welcoming a new student — introduce what PaperDojo is about (daily thinking exercises, not passive reading), what they can do next (`/feed` to browse today's papers), and set the tone for the coaching relationship. Both structured info and warm words.
 
 ## Returning User
 

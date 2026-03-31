@@ -20,18 +20,56 @@ Then continue to Step 2.
 
 **If exists and has interests:** continue to Step 2.
 
-## Step 2: Fetch + Rank (Subagent)
+## Step 2: Fetch + Rank
 
 Read `.paperdojo/interests.toml` to get the user's interests.
 
 Read all files in `.paperdojo/feeds/` to collect previously seen arxiv IDs (all `arxiv_id` values from all feed records). These must be excluded from results.
 
-Dispatch a subagent with the Agent tool:
+### Fetch papers
+
+Two tiers depending on what's available:
+
+**Fast path (arxiv-mcp-server installed):** Call `search_papers` MCP tool directly from the main agent:
+- `categories`: list of categories from interests (e.g. `["quant-ph", "cond-mat.str-el"]`)
+- `sort_by`: `"date"`
+- `max_results`: 30
+
+This returns structured JSON — no XML parsing needed.
+
+**Fallback (no MCP):** Dispatch a subagent to fetch via WebFetch in a single request:
 
 ```
-description: "Fetch and rank arxiv papers"
+description: "Fetch arxiv papers"
 prompt: |
-  You are a paper ranking agent. Your job is to fetch recent arxiv papers and rank them by relevance to the user's research interests.
+  Fetch recent papers from the arxiv API in a SINGLE request combining all categories with OR. Use WebFetch:
+
+  URL: `https://export.arxiv.org/api/query?search_query=cat:{cat1}+OR+cat:{cat2}+OR+cat:{cat3}&sortBy=submittedDate&sortOrder=descending&max_results=30`
+
+  Categories: {list categories here}
+
+  Parse the Atom XML response. Extract for each paper: arxiv ID (just the ID part, e.g., "2603.12345"), title, authors, abstract, categories.
+
+  Return results in this format (one per block, separated by ---):
+
+  ARXIV_ID: <id>
+  TITLE: <title>
+  AUTHORS: <authors>
+  ABSTRACT: <abstract>
+  CATEGORIES: <categories>
+  ---
+
+  Do not score or rank. Just fetch and extract. Do not interact with the user.
+```
+
+### Rank papers
+
+After fetching (either path), remove previously seen arxiv IDs, then dispatch a ranking subagent:
+
+```
+description: "Rank arxiv papers by relevance"
+prompt: |
+  You are a paper ranking agent. Score and rank these papers by relevance to the user's research interests.
 
   ## User's interests
 
@@ -39,41 +77,33 @@ prompt: |
   {paste the full contents of interests.toml here}
   </interests>
 
-  ## Previously seen papers (exclude these)
+  ## Papers to rank
 
-  {list of arxiv IDs to exclude, or "none" if empty}
+  {paste the fetched papers here}
 
   ## Instructions
 
-  1. For each category in the user's interests, fetch recent papers from the arxiv API using WebFetch:
-
-     URL: `https://export.arxiv.org/api/query?search_query=cat:{category}&sortBy=submittedDate&sortOrder=descending&max_results=20`
-
-  2. Parse the Atom XML response. Extract for each paper: arxiv ID (from <id> tag — extract just the ID part, e.g., "2603.12345"), title, authors, abstract, categories.
-
-  3. Remove any papers whose arxiv ID is in the exclusion list.
-
-  4. Score each remaining paper on two axes:
-     - **Niche relevance** (0-10): how well it matches the user's specific topics and focus for its category
+  1. Score each paper on two axes:
+     - **Niche relevance** (0-10): how well it matches the user's specific topics and focus
      - **Field significance** (0-10): based on abstract language (strong claims, broad impact), cross-listing in multiple categories, and your knowledge of the field (major groups, trending directions)
 
-  5. Rank by combined score. Return the top 5-10 papers.
+  2. Rank by combined score. Return the top 5-10 papers.
 
-  6. Report results in this exact format (one paper per block, separated by ---):
+  3. Return in this exact format (one per block, separated by ---):
 
      ARXIV_ID: <id>
      TITLE: <title>
      AUTHORS: <authors>
      ABSTRACT: <abstract>
      CATEGORIES: <categories>
-     RELEVANCE: <score>/10
-     SIGNIFICANCE: <score>/10 — <brief note why>
      ---
 
-  Do not interact with the user. Just fetch, score, and return results.
+     Papers must be in ranked order (best first). Do not include scores in the output.
+
+  Do not interact with the user. Just score, rank, and return.
 ```
 
-Parse the subagent's response to extract the ranked paper list.
+Parse the subagent's response to extract the ranked paper list. The scores are for internal ranking only — do NOT show them to the user.
 
 If the subagent returns no papers, ask the user what they'd like to do. Do not provide hardcoded fallback suggestions.
 
@@ -86,7 +116,6 @@ For each paper, display:
 ```
 [{index}/{total}] "{title}"
 Authors: {authors}  |  {primary_category}  |  {date}
-Relevance: {relevance}/10  |  Significance: {significance}/10 — {note}
 
 {abstract}
 
