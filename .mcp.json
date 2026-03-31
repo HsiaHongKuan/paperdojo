@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "arxiv-latex-mcp": {
+      "command": ".paperdojo/venv/bin/python",
+      "args": ["-m", "arxiv_latex_mcp"]
+    }
+  }
+}

@@ -150,7 +150,23 @@ Uses `arxiv-latex-mcp`'s `get_paper_section` to fetch the introduction. Summariz
 - **Not needed for:** `/setup`, `/feed` browse (titles + abstracts)
 - **Needed for:** `/feed` `[d]` details, `/coach`
 - **Detection:** check if the MCP server is available in the current session
-- **Just-in-time install:** when needed and missing, ask "arxiv-latex-mcp is required. Install now? [y/n]" — install, then continue. User stays in flow.
+- **Install method:** local venv inside `.paperdojo/`:
+  ```bash
+  python3 -m venv .paperdojo/venv
+  .paperdojo/venv/bin/pip install arxiv-latex-mcp
+  ```
+  Project-scoped `.mcp.json` (committed to repo) references the venv:
+  ```json
+  {
+    "mcpServers": {
+      "arxiv-latex-mcp": {
+        "command": ".paperdojo/venv/bin/python",
+        "args": ["-m", "arxiv_latex_mcp"]
+      }
+    }
+  }
+  ```
+- **Just-in-time install:** when needed and missing, ask "arxiv-latex-mcp is required. Install now? [y/n]" — create venv, install, continue. User stays in flow.
 - **`/setup` pre-installs** so the user won't be interrupted later
 
 ## Skill File Structure
