@@ -127,7 +127,7 @@ For each paper, display with **bold** highlighting on key terms that match the u
 Immediately append to `.paperdojo/feeds/YYYY-MM-DD.json`:
 
 ```json
-{"arxiv_id": "<id>", "title": "<title>", "action": "skipped", "details_viewed": false}
+{"arxiv_id": "<id>", "title": "<title>", "categories": ["<cat1>", "<cat2>"], "action": "skipped", "details_viewed": false}
 ```
 
 If the feed file doesn't exist yet, create it with structure:
@@ -210,7 +210,7 @@ Then re-prompt with:
 Immediately append to `.paperdojo/feeds/YYYY-MM-DD.json`:
 
 ```json
-{"arxiv_id": "<id>", "title": "<title>", "action": "coached", "details_viewed": <true|false>}
+{"arxiv_id": "<id>", "title": "<title>", "categories": ["<cat1>", "<cat2>"], "action": "coached", "details_viewed": <true|false>}
 ```
 
 (Same file read-append-write as `[n]`.)
