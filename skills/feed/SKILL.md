@@ -164,11 +164,9 @@ If available (or after install), dispatch a details subagent:
 ```
 description: "Fetch paper intro details"
 prompt: |
-  Fetch the introduction section of arxiv paper {arxiv_id} using the arxiv-latex-mcp tools.
+  Fetch the full content of arxiv paper {arxiv_id} using the arxiv-latex-mcp tool `get_paper_prompt`. Use ONE call — do not use list_paper_sections or get_paper_section.
 
-  Use `list_paper_sections` to find available sections, then `get_paper_section` to retrieve the introduction.
-
-  From the introduction, extract:
+  From the returned content, find the introduction (may be labeled "Introduction", "I. Introduction", or use inline markers like "Introduction.---"). Extract:
   - The problem being studied and its motivation
   - Key background concepts needed to understand the problem
   - What makes this problem hard or important
