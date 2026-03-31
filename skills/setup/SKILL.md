@@ -42,6 +42,8 @@ Transition naturally — e.g., "Now, as your intellectual sparring partner..."
 
 Present each option with a brief explanation of what it means in practice:
 
+In coaching sessions (`/coach`), you work through a paper's problem with guided hints before seeing the authors' approach — like a sparring match for ideas.
+
 - **Difficulty** (how much you struggle before getting help):
   - guided — frequent hints, won't let you stare at a wall for long
   - balanced (default) — hints when you're stuck, but room to think first
@@ -66,7 +68,7 @@ background = "<what the user said about themselves, if anything>"
 difficulty = "<user_choice>"
 hint_style = "<user_choice>"
 
-[interests.<category>]
+[interests."<category>"]
 topics = [<user_topics>]
 focus = "<user_focus>"
 ```
@@ -83,7 +85,7 @@ Check if `arxiv-latex-mcp` is available by attempting to use one of its tools.
 - **Available:** report "arxiv-latex-mcp is ready."
 - **Not available:** ask the user:
 
-> arxiv-latex-mcp is needed for viewing paper details and coaching sessions. Install now? [y/n]
+> I can install a small helper that reads full paper LaTeX — equations, proofs, and all — instead of just abstracts. Install now? [y/n]
 
 If yes, create a local venv and install both MCP servers:
 ```bash

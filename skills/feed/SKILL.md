@@ -115,7 +115,7 @@ For each paper, display with **bold** highlighting on key terms that match the u
 
 ```
 [{index}/{total}] "{title}"
-Authors: {authors}  |  {primary_category}  |  {date}
+{arxiv_id}  |  {authors}  |  {primary_category}  |  {date}
 
 {abstract with interest-matching terms bolded}
 
@@ -215,15 +215,17 @@ Immediately append to `.paperdojo/feeds/YYYY-MM-DD.json`:
 
 (Same file read-append-write as `[n]`.)
 
-Then announce:
+Report the feed summary (same as `[q]`), then announce:
 
 > Starting coaching session for "{title}" ({arxiv_id})...
 
-Hand off to `/coach {arxiv_id}`. The conversation transitions to the coaching flow. Unseen papers are not recorded and will reappear in the next `/feed` run.
+Hand off to `/coach {arxiv_id}`. The conversation transitions to the coaching flow.
 
 ### On `[q]` (Quit)
 
-The feed record is already up to date (each action appends immediately). Report:
+Record the currently displayed paper (if any) as `"action": "seen"` — the user saw it but made no decision.
+
+Report:
 
 > Feed session complete. {N} papers browsed, {M} skipped, {K} coached.
 
