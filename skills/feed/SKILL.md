@@ -176,7 +176,20 @@ prompt: |
   Return a concise problem description (3-5 paragraphs).
 ```
 
-Present the subagent's output inside a fenced code block (triple backticks) for a clean boxed look. Keep it concise — bullet points over paragraphs where possible. Then re-prompt with:
+Present the subagent's output in a Unicode box using box-drawing characters (┌─┐│└─┘). The description should be detailed yet precise — you are a coach preparing the user to think about this problem. Cover the key concepts, why the problem matters, and what makes it hard. Use bullet points for structure. Example format:
+
+```
+┌─ Problem Description ──────────────────────────────
+│
+│ - Background concept and why it matters
+│ - The specific problem: what is unknown or missing
+│ - Why it's hard: what makes naive approaches fail
+│ - What's at stake: why solving this would be valuable
+│
+└────────────────────────────────────────────────────
+```
+
+Then re-prompt with:
 
 ```
 [n] Next  [s] Start /coach  [q] Quit
