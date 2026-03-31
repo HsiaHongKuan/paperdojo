@@ -5,6 +5,10 @@ description: Configure PaperDojo — set research interests, coaching preference
 
 # /setup — PaperDojo Configuration
 
+## Tone
+
+Be warm and a bit humorous — this is a first date with their paper coach. Use natural transitions between steps. Talk like a human colleague, not a form.
+
 ## Determine Mode
 
 Read `.paperdojo/interests.toml`.
@@ -16,9 +20,9 @@ Read `.paperdojo/interests.toml`.
 
 Walk the user through setup one question at a time.
 
-### Step 1: Research interests (freeform)
+### Step 1: Welcome + research interests
 
-Ask the user what they work on or care about, in their own words. Be warm and a bit humorous — this is a first date with their paper coach. Do NOT list arxiv category codes or assume the user knows them.
+Welcome the user to PaperDojo. Then ask what they work on or care about, in their own words. Do NOT list arxiv category codes or assume the user knows them.
 
 ### Step 2: Map to arxiv categories
 
@@ -34,13 +38,21 @@ When writing `interests.toml`, shared topics go under each relevant category.
 
 ### Step 4: Coaching preferences
 
-Ask:
+Transition naturally — e.g., "Now, as your intellectual sparring partner..."
 
-> Coaching preferences (defaults in brackets):
-> - Difficulty: how aggressive should hints be? [medium] (gentle / medium / direct)
-> - Hint style: [socratic] (socratic / nudge / direct)
->
-> Press enter to accept defaults, or specify your preferences.
+Present each option with a brief explanation of what it means in practice:
+
+- **Difficulty** (how much you struggle before getting help):
+  - guided — frequent hints, won't let you stare at a wall for long
+  - balanced (default) — hints when you're stuck, but room to think first
+  - sink-or-swim — minimal hand-holding, you struggle until you ask
+
+- **Hint style** (how help is delivered):
+  - questioning (default) — answers your questions with questions
+  - pointing — points a direction without spelling it out
+  - telling — tells you the relevant concept or technique
+
+Let the user pick or accept defaults.
 
 ### Step 5: Write config
 
@@ -90,34 +102,14 @@ Report setup complete. Summarize what was configured.
 
 ### Step 1: Present current config
 
-Read `.paperdojo/interests.toml` and present it as a formatted table:
-
-```
-Current PaperDojo configuration:
-
-Coaching: difficulty=medium, hint_style=socratic
-
-Interests:
-  quant-ph
-    Topics: quantum error correction, topological codes
-    Focus: new code constructions and threshold results
-  cs.DS
-    Topics: graph algorithms, approximation
-    Focus: sublinear time algorithms
-```
+Read `.paperdojo/interests.toml` and present it as a formatted table.
 
 ### Step 2: Ask for updates
 
-> Want to update anything? You can:
-> - Add/remove a category
-> - Update topics or focus for a category
-> - Change coaching preferences
-> - Check MCP server status
->
-> Or type "done" if everything looks good.
+Ask if they want to change anything — add/remove categories, update topics/focus, change coaching preferences, or check MCP status.
 
 If the user wants changes, walk through them interactively. After each change, update `interests.toml` and re-present the table.
 
 ### Step 3: MCP check
 
-Same as First Run Step 5.
+Same as First Run Step 6.
