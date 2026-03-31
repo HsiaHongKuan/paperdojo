@@ -111,13 +111,13 @@ If the subagent returns no papers, ask the user what they'd like to do. Do not p
 
 Present papers one at a time. Track a `details_viewed` flag per paper, initially `false`.
 
-For each paper, display:
+For each paper, display with **bold** highlighting on key terms that match the user's interests (from `interests.toml` topics):
 
 ```
 [{index}/{total}] "{title}"
 Authors: {authors}  |  {primary_category}  |  {date}
 
-{abstract}
+{abstract with interest-matching terms bolded}
 
 [d] Details  [n] Next  [s] Start /coach  [q] Quit
 ```
@@ -176,7 +176,7 @@ prompt: |
   Return a concise problem description (3-5 paragraphs).
 ```
 
-Present the subagent's output, then re-prompt with:
+Present the subagent's output inside a fenced code block (triple backticks) for a clean boxed look. Keep it concise — bullet points over paragraphs where possible. Then re-prompt with:
 
 ```
 [n] Next  [s] Start /coach  [q] Quit
