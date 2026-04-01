@@ -63,12 +63,15 @@ def load_analysis(path):
 
 def compute_stats(feeds, history):
     coached = len(history)
-    solved = sum(1 for s in history if s.get("outcome") == "solved")
+    insight_captured = sum(1 for s in history if s.get("insight") == "captured")
+    approach_aligned = sum(1 for s in history if s.get("approach") == "aligned")
     return {
         "browsed": len(feeds),
         "coached": coached,
-        "solved": solved,
-        "solve_rate": round(solved / coached * 100) if coached else 0,
+        "insight_captured": insight_captured,
+        "approach_aligned": approach_aligned,
+        "insight_rate": round(insight_captured / coached * 100) if coached else 0,
+        "approach_rate": round(approach_aligned / coached * 100) if coached else 0,
     }
 
 
@@ -77,16 +80,17 @@ def compute_activity_map(feeds, history):
     for p in feeds:
         d = p.get("feed_date", "")
         if d:
-            activity.setdefault(d, {"papers": 0, "outcome": None})
+            activity.setdefault(d, {"papers": 0, "coaching": None})
             activity[d]["papers"] += 1
     for s in history:
         d = s.get("date", "")
         if d:
-            activity.setdefault(d, {"papers": 0, "outcome": None})
-            outcome = s.get("outcome", "revealed")
-            # solved > revealed > None
-            if outcome == "solved" or activity[d]["outcome"] != "solved":
-                activity[d]["outcome"] = outcome
+            activity.setdefault(d, {"papers": 0, "coaching": None})
+            insight = s.get("insight") == "captured"
+            approach = s.get("approach") == "aligned"
+            level = "good" if (insight or approach) else "missed"
+            if level == "good" or activity[d]["coaching"] != "good":
+                activity[d]["coaching"] = level
     return activity
 
 
@@ -204,9 +208,9 @@ def render_heatmap(activity):
             key = d.isoformat()
             info = activity.get(key, {})
             papers = info.get("papers", 0)
-            outcome = info.get("outcome")
+            coaching = info.get("coaching")
 
-            if papers == 0 and not outcome:
+            if papers == 0 and not coaching:
                 color = "#ebedf0"
             elif papers <= 2:
                 color = "#9be9a8"
@@ -215,16 +219,16 @@ def render_heatmap(activity):
             else:
                 color = "#30a14e"
 
-            if outcome == "solved":
-                border = "border:2px solid #3b82f6;"  # gold
-            elif outcome == "revealed":
-                border = "border:2px solid #e34c26;"  # red-orange
+            if coaching == "good":
+                border = "border:2px solid #3b82f6;"
+            elif coaching == "missed":
+                border = "border:2px solid #e34c26;"
             else:
                 border = ""
 
             tip = f"{key}: {papers} paper{'s' if papers != 1 else ''}"
-            if outcome:
-                tip += f", {outcome}"
+            if coaching:
+                tip += f", coached ({'good' if coaching == 'good' else 'needs work'})"
 
             cells.append(
                 f'<div class="hm-cell" style="grid-row:{row};grid-column:{col};'
@@ -272,8 +276,10 @@ def render_glance(glance, stats):
         parts.append(
             f"Of your <strong>{coached}</strong> coaching "
             f"{'session' if coached == 1 else 'sessions'}, "
-            f"you solved <strong>{stats['solved']}</strong> "
-            f"({stats['solve_rate']}% solve rate)"
+            f"you captured the insight in <strong>{stats['insight_captured']}</strong> "
+            f"({stats['insight_rate']}%) and aligned on approach in "
+            f"<strong>{stats['approach_aligned']}</strong> "
+            f"({stats['approach_rate']}%)"
         )
     if not parts:
         return ""
@@ -367,17 +373,20 @@ def render_recent(sessions):
         return ""
     rows = []
     for s in sessions:
-        outcome = s.get("outcome", "")
-        cls = "solved" if outcome == "solved" else "revealed"
+        insight = s.get("insight", "")
+        approach = s.get("approach", "")
+        i_cls = "good" if insight == "captured" else "missed"
+        a_cls = "good" if approach == "aligned" else "missed"
         rows.append(
             f"<tr><td>{esc(s.get('date', ''))}</td>"
             f"<td>{esc(s.get('title', ''))}</td>"
-            f'<td class="outcome {cls}">{esc(outcome)}</td></tr>'
+            f'<td class="outcome {i_cls}">{esc(insight)}</td>'
+            f'<td class="outcome {a_cls}">{esc(approach)}</td></tr>'
         )
     return (
         '<h2>Recent Sessions</h2>'
         '<table class="sessions"><thead><tr>'
-        "<th>Date</th><th>Paper</th><th>Outcome</th>"
+        "<th>Date</th><th>Paper</th><th>Insight</th><th>Approach</th>"
         f'</tr></thead><tbody>{"".join(rows)}</tbody></table>'
     )
 
@@ -427,8 +436,8 @@ h2{{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px}}
 .sessions th{{font-size:12px;color:#64748b;text-transform:uppercase;text-align:left;padding:8px 12px;border-bottom:2px solid #e2e8f0}}
 .sessions td{{font-size:14px;padding:10px 12px;border-bottom:1px solid #f1f5f9}}
 .outcome{{font-weight:600;font-size:13px}}
-.outcome.solved{{color:#166534}}
-.outcome.revealed{{color:#b45309}}
+.outcome.good{{color:#166534}}
+.outcome.missed{{color:#b45309}}
 .empty{{color:#94a3b8;font-size:13px;font-style:italic}}
 .charts-row{{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}}
 .chart-card{{background:white;border:1px solid #e2e8f0;border-radius:8px;padding:16px}}
@@ -455,8 +464,8 @@ h2{{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px}}
 <div class="stats">
 <div><div class="stat-val">{stats['browsed']}</div><div class="stat-lbl">Papers Browsed</div></div>
 <div><div class="stat-val">{stats['coached']}</div><div class="stat-lbl">Coached</div></div>
-<div><div class="stat-val">{stats['solved']}</div><div class="stat-lbl">Solved</div></div>
-<div><div class="stat-val">{stats['solve_rate']}%</div><div class="stat-lbl">Solve Rate</div></div>
+<div><div class="stat-val">{stats['insight_rate']}%</div><div class="stat-lbl">Insight Rate</div></div>
+<div><div class="stat-val">{stats['approach_rate']}%</div><div class="stat-lbl">Approach Rate</div></div>
 </div>
 
 <div class="heatmap-wrap">
@@ -471,9 +480,9 @@ h2{{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px}}
 <span>More</span>
 <span style="margin-left:12px"></span>
 <div class="legend-cell" style="background:#9be9a8;border:2px solid #e34c26"></div>
-<span>Revealed</span>
+<span>Miss</span>
 <div class="legend-cell" style="background:#9be9a8;border:2px solid #3b82f6"></div>
-<span>Solved</span>
+<span>Hit</span>
 </div>
 </div>
 

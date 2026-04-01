@@ -79,8 +79,30 @@ Freeform conversation. Read coaching preferences from `interests.toml`:
 - Hint style: `questioning` / `pointing` / `telling`
 - Defaults if not set: `balanced` + `questioning`
 
-Behavior:
-- When the user's thinking touches ideas **related to the paper's approach**, give positive reinforcement — "that connects to something important here", "you're pulling on the right thread". Guide them closer without naming the specific technique or result.
+### Internal tracking
+
+Before starting the loop, identify 2-4 **key ideas** from the paper's approach. Track which ones the user touches. Use untouched ideas to guide hints when the user is stuck. Don't enforce an order — let the user's thinking lead.
+
+### Visual formatting
+
+Use styled boxes for hints — they should stand out from conversational text:
+
+```
+┌─ Hint ────────────────────────────────────────────
+│
+│ The hint question or pointer goes here.
+│
+└────────────────────────────────────────────────────
+```
+
+Use bold inline prefixes for lighter coaching moments:
+
+- **On track** — for positive reinforcement when the user touches a key idea.
+- **Worth reconsidering** — for gentle redirects when the user's approach misses a constraint or subtlety.
+
+### Behavior
+
+- When the user's thinking touches ideas **related to the paper's approach**, give positive reinforcement. Guide them closer without naming the specific technique or result.
 - When the user goes down a dead end, gently redirect — don't say "that's wrong", instead point out what constraint or subtlety their approach might be missing.
 - When the user asks a question about the problem setup, answer it — they need to understand the problem to solve it.
 - When the user is stuck, calibrate hints to their coaching preferences.
@@ -91,10 +113,41 @@ Behavior:
 
 Triggered by user: "show me", "let me compare", "I think I've got it", "I give up", or similar.
 
-Present the paper's approach. Discuss:
-- Where the user's thinking aligned with the paper
-- Where it diverged — and whether the divergence was a valid alternative or a misconception
-- Key insights the user might want to remember
+Before revealing, ask the user to **state their proposed approach**: "Before we compare — summarize your approach in a few sentences." This forces commitment and makes the comparison meaningful.
+
+Present the paper's approach and comparison in boxes:
+
+```
+┌─ Authors' Approach ───────────────────────────────
+│ ...
+└────────────────────────────────────────────────────
+
+┌─ Where You Aligned ───────────────────────────────
+│ ...
+└────────────────────────────────────────────────────
+
+┌─ Where You Diverged ──────────────────────────────
+│ ...
+└────────────────────────────────────────────────────
+
+┌─ Key Takeaway ────────────────────────────────────
+│ ...
+└────────────────────────────────────────────────────
+```
+
+### Calibrated wrap-up
+
+Evaluate the user's thinking on two independent dimensions:
+
+- **Insight** — did the user capture the core conceptual insight (what makes the problem hard, what the key idea is)?
+- **Approach** — did the user propose the right method or technique?
+
+These are orthogonal. Calibrate your language accordingly:
+
+| | Right approach | Wrong approach |
+|---|---|---|
+| **Captured insight** | "You nailed it — both the core idea and how to get there." | "You saw exactly what makes this hard. Your method was different — the authors went with X because Y." |
+| **Missed insight** | "Your method would work, and that's impressive. The deeper reason it works is actually Z — worth sitting with." | "This one's genuinely tricky. The key insight was X, which is non-obvious because Y." |
 
 ## Step 6: Save session
 
@@ -106,7 +159,8 @@ Create `.paperdojo/history/` directory if needed. Write to `.paperdojo/history/Y
   "title": "<title>",
   "date": "YYYY-MM-DD",
   "source": "feed or direct",
-  "outcome": "solved or revealed",
+  "insight": "captured or missed",
+  "approach": "aligned or divergent",
   "conversation": [
     {"role": "coach", "content": "..."},
     {"role": "user", "content": "..."}
@@ -115,7 +169,8 @@ Create `.paperdojo/history/` directory if needed. Write to `.paperdojo/history/Y
 ```
 
 - `source`: `"feed"` if handed off from `/feed`, `"direct"` if user ran `/coach` directly
-- `outcome`: `"solved"` if user arrived at the solution, `"revealed"` if user asked to see it
+- `insight`: `"captured"` if user identified the core conceptual insight, `"missed"` otherwise
+- `approach`: `"aligned"` if user proposed the right method/technique, `"divergent"` otherwise
 - `conversation`: reconstruct the coaching conversation (problem presentation, user's attempts, hints given, reveal)
 
 After saving, briefly summarize: what went well, what concepts to revisit. Let the user know that to browse more papers, start a fresh `/feed` session. End warmly.

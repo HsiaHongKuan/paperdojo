@@ -38,7 +38,7 @@ prompt: |
   - "coaching_patterns": How the user approaches problems. Reasoning styles, solve rate trend.
   - "best_moments": Moments where the user's thinking was strong or novel. Reference paper titles.
   - "stuck_points": Recurring patterns where the user gets stuck. Frame as growth areas, not failures.
-  - "topics_to_revisit": Based on "revealed" outcomes and hints needed, suggest concepts to revisit.
+  - "topics_to_revisit": Based on missed insights, divergent approaches, and hints needed, suggest concepts to revisit.
   - "research_directions": Themes emerging across sessions. Connections between papers.
 
   Return ONLY the JSON object. No commentary.
