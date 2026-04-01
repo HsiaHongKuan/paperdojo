@@ -178,4 +178,21 @@ Create `.paperdojo/history/` directory if needed. Write to `.paperdojo/history/Y
 - `approach`: `"aligned"` if user proposed the right method/technique, `"divergent"` otherwise
 - `conversation`: reconstruct the coaching conversation (problem presentation, user's attempts, hints given, reveal)
 
-After saving, briefly summarize: what went well, what concepts to revisit. Let the user know that to browse more papers, start a fresh `/feed` session. End warmly.
+After saving, briefly summarize: what went well, what concepts to revisit.
+
+Then generate the HTML session report:
+
+```bash
+python3 scripts/generate_session_report.py {arxiv_id}
+```
+
+Open it:
+
+```bash
+open .paperdojo/session-report-{arxiv_id}.html   # macOS
+xdg-open .paperdojo/session-report-{arxiv_id}.html   # Linux
+```
+
+Report: "Session report written to `.paperdojo/session-report-{arxiv_id}.html` and opened in your browser."
+
+Let the user know that to browse more papers, start a fresh `/feed` session. End warmly.

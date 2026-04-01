@@ -5,6 +5,79 @@ description: Daily arxiv paper feed — fetches and ranks papers by relevance to
 
 # /feed — Daily Paper Feed
 
+## Entry
+
+- `/feed` — browse today's ranked paper feed (default flow, starts at Step 1).
+- `/feed <arxiv_id>` — look up a specific paper. Skips fetch+rank, goes straight to that paper.
+
+## Lookup Mode
+
+When an arxiv ID is provided (e.g., `/feed 2603.12345`):
+
+1. **Config check** — same as Step 1 below. Interests are needed for calibrating details.
+
+2. **Fetch paper metadata** — dispatch a subagent:
+
+   ```
+   description: "Fetch arxiv paper metadata"
+   prompt: |
+     Fetch metadata for arxiv paper {arxiv_id} using WebFetch:
+
+     URL: `https://export.arxiv.org/api/query?id_list={arxiv_id}`
+
+     Parse the Atom XML. Extract: arxiv ID, title, authors, abstract, categories.
+
+     Return in this format:
+
+     ARXIV_ID: <id>
+     TITLE: <title>
+     AUTHORS: <authors>
+     ABSTRACT: <abstract>
+     CATEGORIES: <categories>
+
+     Do not interact with the user.
+   ```
+
+3. **Check for existing session** — read `.paperdojo/history/` for any file matching `*-{arxiv_id}.json`. If a coaching session exists, add `[r] Session report` to the actions.
+
+4. **Present the paper** — same format as Step 3 browse, with interest-matching terms bolded:
+
+   ```
+   "{title}"
+   {arxiv_id}  |  {authors}  |  {primary_category}
+
+   {abstract with interest-matching terms bolded}
+
+   [d] Details  [s] Start /coach  [r] Session report  [q] Done
+   ```
+
+   Omit `[r]` if no coaching session exists for this paper.
+
+5. **Handle actions:**
+   - `[d]` — same as Step 3's `[d]` Details.
+   - `[s]` — record as `"action": "coached"` in feed file, hand off to `/coach {arxiv_id}`.
+   - `[r]` — generate a single-paper session report (see [Session Report](#session-report) below).
+   - `[q]` — record as `"action": "seen"` in feed file, done.
+
+   After `[d]`, re-prompt without `[d]`. After `[r]`, re-prompt with remaining actions.
+
+Record the paper in `.paperdojo/feeds/YYYY-MM-DD.json` same as the browse flow.
+
+---
+
+## Session Report
+
+Generate the HTML session report by running `scripts/generate_session_report.py` — same as `/coach` does at the end of a session:
+
+```bash
+python3 scripts/generate_session_report.py {arxiv_id}
+open .paperdojo/session-report-{arxiv_id}.html   # macOS
+```
+
+Report: "Session report opened in your browser."
+
+---
+
 ## Step 1: Config Check
 
 Read `.paperdojo/interests.toml`.
@@ -122,8 +195,10 @@ For each paper, display with **bold** highlighting on key terms that match the u
 
 {abstract with interest-matching terms bolded}
 
-[d] Details  [n] Next  [s] Start /coach  [q] Quit
+[d] Details  [n] Next  [s] Start /coach  [r] Session report  [q] Quit
 ```
+
+Only show `[r]` if a coaching session exists for the current paper (check `.paperdojo/history/` for `*-{arxiv_id}.json`).
 
 ### On `[n]` (Next)
 
@@ -207,6 +282,10 @@ Then re-prompt with:
 ```
 
 (No `[d]` — details already viewed.)
+
+### On `[r]` (Session report)
+
+Generate the session report for this paper (see [Session Report](#session-report) above). After displaying the report, re-prompt with the current paper's remaining actions (exclude `[r]` since it was just shown).
 
 ### On `[s]` (Start /coach)
 
