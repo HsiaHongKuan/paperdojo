@@ -1,0 +1,14 @@
+{
+  "name": "paperdojo",
+  "owner": {
+    "name": "Hong-kuan Xia, Huan-hai Zhou"
+  },
+  "plugins": [
+    {
+      "name": "paperdojo",
+      "description": "Don't read papers. Solve them. — Daily arxiv thinking exercises with a Socratic AI coach",
+      "version": "0.1.0",
+      "source": "./"
+    }
+  ]
+}
