@@ -22,7 +22,7 @@ Walk the user through setup one question at a time.
 
 ### Step 1: Welcome + research interests
 
-Welcome the user to PaperDojo. Then ask what they work on or care about, in their own words. Do NOT list arxiv category codes or assume the user knows them.
+Welcome the user to PaperDojo. Then ask what they work on or care about. Don't mention config files, setup state, or how to format their answer — just ask the question. Do NOT list arxiv category codes or assume the user knows them.
 
 ### Step 2: Map to arxiv categories
 
