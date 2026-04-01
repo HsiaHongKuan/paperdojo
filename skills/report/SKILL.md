@@ -13,50 +13,111 @@ If no feed or history files exist, tell the user there's nothing to report yet �
 
 ## Step 2: Analyze coaching conversations
 
-If history files exist, dispatch a subagent to analyze the coaching conversations:
+If no history files exist, skip this step — write `{"extractions": {}, "synthesis": {}}` to `.paperdojo/report.json`.
+
+### Incremental caching
+
+Read `.paperdojo/report.json` if it exists. Compare session IDs in `extractions` against files in `.paperdojo/history/`.
+
+- **No new sessions:** skip to Step 3 — reuse existing `report.json`.
+- **New sessions:** run Stage 1 only for the new ones, then re-run Stage 2 with all extractions.
+
+### Stage 1: Per-session extraction
+
+Dispatch one subagent per **new** coaching session in parallel. Each subagent receives `interests.toml` and one session file:
 
 ```
-description: "Analyze coaching history"
+description: "Extract patterns from {paper_title}"
 prompt: |
-  Analyze the user's PaperDojo coaching history and produce insights.
+  Extract thinking patterns from this PaperDojo coaching session.
 
   ## User's interests
-
   <interests>
   {paste interests.toml contents}
   </interests>
 
-  ## Coaching sessions
-
-  {paste all history JSON files — full conversation for each}
+  ## Session
+  {paste one history JSON file}
 
   ## Instructions
 
-  Produce a JSON object with these keys. Be specific — reference actual papers and moments. Keep each section concise (2-4 bullet points in markdown).
-
-  - "at_a_glance": 2-3 sentence warm summary of the coaching journey so far.
-  - "coaching_patterns": How the user approaches problems. Reasoning styles, solve rate trend.
-  - "best_moments": Moments where the user's thinking was strong or novel. Reference paper titles.
-  - "stuck_points": Recurring patterns where the user gets stuck. Frame as growth areas, not failures.
-  - "topics_to_revisit": Based on missed insights, divergent approaches, and hints needed, suggest concepts to revisit.
-  - "research_directions": Themes emerging across sessions. Connections between papers.
+  Return a JSON object:
+  - "trigger_reactions": array of {trigger, reaction, name} — reasoning moves the user made. Name each with a verb phrase (e.g., "Kill the boring explanation first"). Only include genuine patterns, not routine steps.
+  - "key_moment": the single most impressive or revealing moment — one sentence.
+  - "stuck_on": what the user struggled with, if anything — one sentence. Null if none.
+  - "insight": "captured" or "missed"
+  - "approach": "aligned" or "divergent"
 
   Return ONLY the JSON object. No commentary.
 ```
 
-Write the subagent's output to `.paperdojo/report_analysis.json`.
+Append the new extractions to the `extractions` dict in `report.json`, keyed by session ID (e.g., `"2026-03-28-2603.19247"`).
 
-If no history files exist, skip this step (the report will show stats, heatmap, and word cloud without narrative sections).
+### Stage 2: Synthesis
+
+Dispatch one subagent with **all** extractions (cached + new), plus `interests.toml` and activity metadata (dates active, gaps, session count):
+
+```
+description: "Synthesize coaching analysis"
+prompt: |
+  Synthesize a coaching analysis from individual session extractions.
+
+  ## User's interests
+  <interests>
+  {paste interests.toml contents}
+  </interests>
+
+  ## Activity metadata
+  Sessions: {count}, Dates: {date list}, Gaps: {any gaps > 2 days}
+
+  ## Per-session extractions
+  {paste all extractions, labeled by paper title and date}
+
+  ## Instructions
+
+  Produce a JSON object with these keys. Find cross-session patterns — a pattern must appear in 2+ sessions to be included. Be specific, reference actual papers.
+
+  - "at_a_glance": object with four fields, written in a warm coach voice:
+    - "opening": a casual 1-2 sentence greeting that reflects the user's recent activity pattern (streak, consistency, gaps) and overall performance. Be warm and encouraging — like a coach wrapping up the week. Examples: "5 sessions this week — nice streak! You're sharpest on the experimental transport papers." / "Welcome back! It's been a few days — ready for some sparring?"
+    - "sharpest": 1-2 sentences on when the user's thinking is strongest. Link to deeper section.
+    - "stretch": 1-2 sentences on growth areas, framed as a coach's gentle nudge. Constructive, not critical.
+    - "try_next": 1 sentence directional nudge — point a direction without prescribing a specific paper or problem. Concrete suggestions go in "topics_to_revisit".
+  - "coaching_patterns": markdown, 3-4 bullets on reasoning style across sessions.
+  - "thinking_patterns": markdown with 3-4 named trigger→reaction patterns. Each as:
+    ### Pattern: <verb phrase>
+    **Trigger:** what situation triggers this
+    **Reaction:** what the user does
+    **Example:** concrete example from a specific paper
+  - "best_moments": markdown, 3-4 bullets referencing specific papers.
+  - "stuck_points": markdown, 2-3 bullets framed as growth areas.
+  - "topics_to_revisit": markdown, 2-3 bullets.
+
+  Return ONLY the JSON object. No commentary.
+```
+
+Write the final `report.json` with both `extractions` and `synthesis`:
+
+```json
+{
+  "extractions": {
+    "<session-id>": { ... },
+    ...
+  },
+  "synthesis": {
+    "at_a_glance": { ... },
+    "coaching_patterns": "...",
+    ...
+  }
+}
+```
 
 ## Step 3: Generate report
-
-Run the report generator:
 
 ```bash
 python3 scripts/generate_report.py
 ```
 
-This reads feeds, history, and analysis data, then writes `.paperdojo/report.html`.
+The script reads `.paperdojo/report.json`, feeds, and history, then writes `.paperdojo/report.html`.
 
 ## Step 4: Open
 

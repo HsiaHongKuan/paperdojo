@@ -15,7 +15,9 @@ BASE = Path(".paperdojo")
 def main():
     feeds = load_feeds(BASE / "feeds")
     history = load_history(BASE / "history")
-    analysis = load_analysis(BASE / "report_analysis.json")
+    report_json = BASE / "report.json"
+    report_data = json.loads(report_json.read_text()) if report_json.exists() else {}
+    analysis = report_data.get("synthesis", {})
 
     if not feeds and not history:
         print("No data yet. Try /feed or /coach first.")
@@ -23,13 +25,12 @@ def main():
 
     stats = compute_stats(feeds, history)
     activity = compute_activity_map(feeds, history)
-    glance = compute_feed_glance(feeds)
     categories = compute_categories(feeds)
     words = compute_word_cloud(feeds, history)
     recent = recent_sessions(history)
 
     out = BASE / "report.html"
-    out.write_text(render(stats, activity, glance, categories, words, recent, analysis))
+    out.write_text(render(stats, activity, categories, words, recent, analysis))
     print(f"Report written to {out}")
 
 
@@ -52,10 +53,6 @@ def load_history(history_dir):
     if not history_dir.exists():
         return []
     return [json.loads(f.read_text()) for f in sorted(history_dir.glob("*.json"))]
-
-
-def load_analysis(path):
-    return json.loads(path.read_text()) if path.exists() else {}
 
 
 # --- Computation ---
@@ -92,19 +89,6 @@ def compute_activity_map(feeds, history):
             if level == "good" or activity[d]["coaching"] != "good":
                 activity[d]["coaching"] = level
     return activity
-
-
-def compute_feed_glance(feeds):
-    detailed = sum(1 for p in feeds if p.get("details_viewed"))
-    coached = sum(1 for p in feeds if p.get("action") == "coached")
-    total = len(feeds)
-    detail_rate = round(detailed / total * 100) if total else 0
-    return {
-        "total": total,
-        "detailed": detailed,
-        "coached": coached,
-        "detail_rate": detail_rate,
-    }
 
 
 def recent_sessions(history, n=10):
@@ -149,16 +133,25 @@ def esc(text):
 
 
 def md_to_html(text):
-    """Minimal markdown: paragraphs, bold, bullet lists."""
+    """Minimal markdown: paragraphs, bold, italic, bullet lists, h3/h4 headers."""
     if not text:
         return ""
     text = re.sub(r"\*\*(.+?)\*\*", r"__B__\1__/B__", text)
+    text = re.sub(r"\*(.+?)\*", r"__I__\1__/I__", text)
     text = html_mod.escape(text)
     text = text.replace("__B__", "<strong>").replace("__/B__", "</strong>")
+    text = text.replace("__I__", "<em>").replace("__/I__", "</em>")
 
     result = []
     for para in text.strip().split("\n\n"):
         lines = [l.strip() for l in para.split("\n") if l.strip()]
+        if not lines:
+            continue
+        if lines[0].startswith("### "):
+            result.append(f"<h4>{lines[0][4:]}</h4>")
+            lines = lines[1:]
+            if not lines:
+                continue
         if all(l.startswith("- ") for l in lines):
             items = "".join(f"<li>{l[2:]}</li>" for l in lines)
             result.append(f"<ul>{items}</ul>")
@@ -257,40 +250,39 @@ def render_heatmap(activity):
 # --- Feed glance ---
 
 
-def render_glance(glance, stats):
+def render_glance(analysis):
+    glance = analysis.get("at_a_glance")
+    if not glance or not isinstance(glance, dict):
+        return ""
+
     parts = []
-    t, d, c = glance["total"], glance["detailed"], glance["coached"]
-    if t:
+    # Opening line — casual, reflects activity
+    opening = glance.get("opening", "")
+    if opening:
         parts.append(
-            f"You've browsed <strong>{t}</strong> papers so far"
+            f'<div class="glance-section">{esc(opening)}</div>'
         )
-        if d:
+
+    labels = [
+        ("sharpest", "You're sharpest when:", "section-patterns"),
+        ("stretch", "Stretch zone:", "section-growth"),
+        ("try_next", "Try next:", "section-revisit"),
+    ]
+    for key, label, anchor in labels:
+        text = glance.get(key, "")
+        if text:
             parts.append(
-                f"explored <strong>{d}</strong> in detail "
-                f"({glance['detail_rate']}% detail rate)"
+                f'<div class="glance-section">'
+                f'<strong>{label}</strong> {esc(text)} '
+                f'<a href="#{anchor}" class="see-more">See more \u2192</a>'
+                f'</div>'
             )
-        if c:
-            parts.append(f"and coached on <strong>{c}</strong>")
-    coached = stats["coached"]
-    if coached:
-        parts.append(
-            f"Of your <strong>{coached}</strong> coaching "
-            f"{'session' if coached == 1 else 'sessions'}, "
-            f"you captured the insight in <strong>{stats['insight_captured']}</strong> "
-            f"({stats['insight_rate']}%) and aligned on approach in "
-            f"<strong>{stats['approach_aligned']}</strong> "
-            f"({stats['approach_rate']}%)"
-        )
     if not parts:
         return ""
-    text = ", ".join(parts[:3])
-    if len(parts) > 3:
-        text += ". " + parts[3]
-    else:
-        text += "."
     return (
         '<div class="glance">'
-        f'<p>{text}</p>'
+        '<div class="glance-title">At a Glance</div>'
+        f'<div class="glance-sections">{"".join(parts)}</div>'
         '</div>'
     )
 
@@ -342,23 +334,22 @@ def render_word_cloud(words):
 # --- Sections ---
 
 SECTIONS = [
-    ("at_a_glance", "At a Glance", "#fef3c7", "#92400e", "#f59e0b"),
-    ("coaching_patterns", "Coaching Patterns", "#eff6ff", "#1e40af", "#bfdbfe"),
-    ("best_moments", "Best Moments", "#f0fdf4", "#166534", "#bbf7d0"),
-    ("stuck_points", "Growth Areas", "#fff7ed", "#9a3412", "#fed7aa"),
-    ("topics_to_revisit", "Topics to Revisit", "#eff6ff", "#1e40af", "#bfdbfe"),
-    ("research_directions", "Research Directions", "#faf5ff", "#5b21b6", "#c4b5fd"),
+    ("coaching_patterns", "Coaching Patterns", "#eff6ff", "#1e40af", "#bfdbfe", "section-patterns"),
+    ("thinking_patterns", "Thinking Patterns", "#f0f9ff", "#0c4a6e", "#7dd3fc", "section-thinking"),
+    ("best_moments", "Best Moments", "#f0fdf4", "#166534", "#bbf7d0", "section-moments"),
+    ("stuck_points", "Growth Areas", "#fff7ed", "#9a3412", "#fed7aa", "section-growth"),
+    ("topics_to_revisit", "Topics to Revisit", "#eff6ff", "#1e40af", "#bfdbfe", "section-revisit"),
 ]
 
 
 def render_sections(analysis):
     parts = []
-    for key, title, bg, fg, border in SECTIONS:
+    for key, title, bg, fg, border, anchor in SECTIONS:
         content = analysis.get(key)
         if not content:
             continue
         parts.append(
-            f'<div class="card" style="background:{bg};border-color:{border}">'
+            f'<div id="{anchor}" class="card" style="background:{bg};border-color:{border}">'
             f'<h2 style="color:{fg}">{title}</h2>'
             f'<div class="card-body">{md_to_html(content)}</div></div>'
         )
@@ -394,7 +385,7 @@ def render_recent(sessions):
 # --- Full page ---
 
 
-def render(stats, activity, glance, categories, words, recent, analysis):
+def render(stats, activity, categories, words, recent, analysis):
     # Date range subtitle
     if activity:
         dates = sorted(activity.keys())
@@ -450,8 +441,13 @@ h2{{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px}}
 .word-cloud{{line-height:2;padding:8px 0}}
 .word-cloud-card{{background:white;border:1px solid #e2e8f0;border-radius:8px;padding:16px;margin-bottom:16px}}
 .word-cloud span{{display:inline-block;margin:2px 6px;color:#334155;font-weight:500}}
-.glance{{background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:1px solid #f59e0b;border-radius:8px;padding:16px 20px;margin-bottom:32px}}
-.glance p{{font-size:14px;color:#78350f;line-height:1.6}}
+.glance{{background:linear-gradient(135deg,#fef3c7 0%,#fde68a 100%);border:1px solid #f59e0b;border-radius:12px;padding:20px 24px;margin-bottom:32px}}
+.glance-title{{font-size:16px;font-weight:700;color:#92400e;margin-bottom:16px}}
+.glance-sections{{display:flex;flex-direction:column;gap:12px}}
+.glance-section{{font-size:14px;color:#78350f;line-height:1.6}}
+.glance-section strong{{color:#92400e}}
+.see-more{{color:#b45309;text-decoration:none;font-size:13px;white-space:nowrap}}
+.see-more:hover{{text-decoration:underline}}
 </style>
 </head>
 <body>
@@ -459,7 +455,7 @@ h2{{font-size:18px;font-weight:600;color:#0f172a;margin-bottom:12px}}
 <h1>PaperDojo Report</h1>
 <p class="subtitle">{subtitle}</p>
 
-{render_glance(glance, stats)}
+{render_glance(analysis)}
 
 <div class="stats">
 <div><div class="stat-val">{stats['browsed']}</div><div class="stat-lbl">Papers Browsed</div></div>
