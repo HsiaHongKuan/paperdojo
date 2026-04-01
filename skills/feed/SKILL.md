@@ -14,7 +14,7 @@ Read `.paperdojo/interests.toml`.
 1. Ask what they work on or care about, in their own words. Be warm and humorous — they came for papers, not a form.
 2. Map their description to arxiv categories. Present as a table with full names and why each matches. Let them adjust.
 3. Ask about topics and focus once (not per-category — interests often span multiple categories). Show a playful non-real example for the format. Focus is optional.
-4. Write `.paperdojo/interests.toml` with defaults for `[coaching]`. Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
+4. Write `.paperdojo/interests.toml` with defaults for `[coaching]`. Distribute topics to categories where they naturally belong — don't copy all topics to all categories. Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
 
 Then continue to Step 2.
 

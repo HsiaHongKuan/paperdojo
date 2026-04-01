@@ -34,7 +34,7 @@ Ask about specific topics and focus **once** — not per-category. The user's in
 
 Use **bold** for category names and `code` for arxiv codes to make the output scannable. Illustrate the format with a playful, obviously-not-real example (e.g., topics: "time-traveling qubits", focus: "ones that arrive before they leave"). Focus is optional — don't push if the user doesn't have one.
 
-When writing `interests.toml`, shared topics go under each relevant category.
+When writing `interests.toml`, distribute topics to the categories where they naturally belong. A topic may appear under multiple categories if genuinely relevant, but don't force-fit — "quantum oscillations" belongs under `mes-hall`, not `cs.LG`. If the user mentioned interests tied to a specific category (e.g., Majorana modes for superconductivity), capture those even if the user didn't spell them out as separate "topics."
 
 ### Step 4: Coaching preferences
 
