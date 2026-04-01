@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.svg" width="300" alt="PaperDojo logo">
+</p>
+
 # PaperDojo
 
 **Don't read papers. Solve them.**
