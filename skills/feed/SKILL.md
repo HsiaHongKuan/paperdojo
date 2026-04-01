@@ -5,6 +5,8 @@ description: Daily arxiv paper feed — fetches and ranks papers by relevance to
 
 # /feed — Daily Paper Feed
 
+Data formats: see `docs/schema.md`.
+
 ## Step 1: Config Check
 
 Read `.paperdojo/interests.toml`.

@@ -5,6 +5,8 @@ description: Historical dashboard of PaperDojo coaching sessions — generates a
 
 # /report — Coaching Dashboard
 
+Data formats: see `docs/schema.md`.
+
 ## Step 1: Collect data
 
 Read all files in `.paperdojo/feeds/` and `.paperdojo/history/`. Also read `.paperdojo/interests.toml` for context.
