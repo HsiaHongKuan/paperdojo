@@ -5,26 +5,23 @@ description: Daily arxiv paper feed — fetches and ranks papers by relevance to
 
 # /feed — Daily Paper Feed
 
-Data formats: see `docs/schema.md`.
-
 ## Step 1: Config Check
 
 Read `.paperdojo/interests.toml`.
 
-**If missing or has no `[interests.*]` sections:** run a lightweight inline setup (same interactive style as `/setup`, skip coaching preferences — use defaults):
+**If missing or has no `[interests.*]` sections:** run a lightweight inline setup. Walk through each step one at a time — wait for the user's reply before moving to the next step. Skip coaching preferences (use defaults).
 
-1. Ask what they work on or care about. Don't mention config files, setup state, or how to format their answer — just ask the question. Be warm and humorous — they came for papers, not a form.
-2. Map their description to arxiv categories. Present as a table with full names and why each matches. Let them adjust.
-3. Ask about topics and focus once (not per-category — interests often span multiple categories). Show a playful non-real example for the format. Focus is optional.
-4. Write `.paperdojo/interests.toml` with defaults for `[coaching]`. Distribute topics to categories where they naturally belong — don't copy all topics to all categories. Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`
+1. **Research area** — Tell the user you need to know their research area to find relevant papers. Ask them to describe what they work on or care about, in their own words — e.g., "I study topological phases in condensed matter" or "I work on LLM reasoning and alignment." Be warm and humorous — they came for papers, not a form.
+
+2. **Confirm arxiv categories** — Based on their description, map to arxiv categories. Present as a table with the category code, full name, and why it matches. Explicitly ask: "Want to add or remove any of these?"
+
+3. **Topics and focus** — Explain that topics are specific keywords used to rank papers within their categories, and focus is an optional narrower lens. Give a concrete, playful example: e.g., topics: `["time-traveling qubits", "retrocausal entanglement"]`, focus: `"ones that arrive before they leave"`. Ask: "What specific topics should I prioritize? And optionally, any particular focus or angle?" Make clear that focus is optional.
+
+4. **Write config** — Write `.paperdojo/interests.toml` with defaults for `[coaching]`. Distribute topics to categories where they naturally belong — don't copy all topics to all categories. Create directories: `mkdir -p .paperdojo/feeds .paperdojo/history`. Confirm to the user: "Config saved — fetching your first feed now."
 
 Then continue to Step 2.
 
 **If exists and has interests:** continue to Step 2.
-
-### MCP check
-
-Silently check if `arxiv-latex-mcp` and `arxiv-mcp-server` are available. Remember the result — do not re-check or prompt mid-browse. If neither is available and the user later presses `[d]` or `[s]`, use the fallback paths described in those sections.
 
 ## Step 2: Fetch + Rank
 
@@ -125,14 +122,8 @@ For each paper, display with **bold** highlighting on key terms that match the u
 
 {abstract with interest-matching terms bolded}
 
-[d] Details  [n] Next  [b] Back  [s] Start /coach  [q] Quit
+[d] Details  [n] Next  [s] Start /coach  [q] Quit
 ```
-
-`[b]` is hidden on the first paper (nothing to go back to).
-
-### On `[b]` (Back)
-
-Re-display the previous paper with full options (`[d]`/`[n]`/`[s]`/`[q]`/`[b]`). If the user takes a different action than before (e.g., `[s]` on a paper previously skipped), find and overwrite that paper's record in the feed JSON. Only goes back one paper — not a full history stack.
 
 ### On `[n]` (Next)
 
@@ -212,7 +203,7 @@ Present the subagent's output in a Unicode box titled "Overview" using box-drawi
 Then re-prompt with:
 
 ```
-[n] Next  [b] Back  [s] Start /coach  [q] Quit
+[n] Next  [s] Start /coach  [q] Quit
 ```
 
 (No `[d]` — details already viewed.)
