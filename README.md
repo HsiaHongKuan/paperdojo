@@ -15,31 +15,14 @@ PaperDojo delivers a daily feed of arxiv papers matched to your interests and tu
 
 ## Get started
 
-Run `/setup` to configure your research interests and coaching style. Then `/feed` to browse today's papers — press `[s]` on one to spar. Or jump straight in with `/coach 2603.12345` if you already have a paper. Run `/report` to see your thinking patterns and progress.
+Run `/setup` to tell PaperDojo what you're into. Then `/feed` to browse today's papers — when one catches your eye, press `[s]` or type `/coach` to start sparring. You can also jump in directly with `/coach 2603.12345` if you already have a paper.
 
-## Skills
-
-| Skill | Description |
-|---|---|
-| `/setup` | Configure research interests, coaching preferences, MCP servers |
-| `/feed` | Daily paper browsing with ranked recommendations |
-| `/coach` | Socratic coaching session — work through a paper's problem with guided hints |
-| `/report` | HTML dashboard — heatmap, stats, thinking patterns, coaching insights |
+After a few sessions, run `/report` to see what's working and where to stretch — it surfaces your reasoning patterns, spots gaps in methodology or formalism, and suggests what to revisit.
 
 ## Dependencies
 
 - **arxiv-latex-mcp** — Reads full paper LaTeX source (equations, proofs, everything). Installed automatically via `/setup`.
 - **arxiv Atom API** — Paper search. No setup needed.
-
-## Project structure
-
-```
-skills/              Skill definitions (one directory per skill)
-scripts/             Report generator
-docs/schema.md       Shared data formats for feed/coach/report pipeline
-.claude-plugin/      Plugin and marketplace metadata
-.paperdojo/          Local user state (gitignored)
-```
 
 ## License
 
