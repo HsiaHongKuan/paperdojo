@@ -8,6 +8,8 @@ PaperDojo delivers a daily feed of arxiv papers matched to your interests and tu
 
 ## Install
 
+**Claude Code:**
+
 ```bash
 /plugin marketplace add HsiaHongKuan/paperdojo
 /plugin install paperdojo@paperdojo
@@ -23,6 +25,36 @@ After a few sessions, run `/report` to see what's working and where to stretch �
 
 - **arxiv-latex-mcp** — Reads full paper LaTeX source (equations, proofs, everything). Installed automatically via `/setup`.
 - **arxiv Atom API** — Paper search. No setup needed.
+
+## Other platforms
+
+### Codex
+
+Tell Codex:
+
+```
+Fetch and follow instructions from https://raw.githubusercontent.com/HsiaHongKuan/paperdojo/refs/heads/main/.codex/INSTALL.md
+```
+
+### OpenCode
+
+Tell OpenCode:
+
+```
+Fetch and follow instructions from https://raw.githubusercontent.com/HsiaHongKuan/paperdojo/refs/heads/main/.opencode/INSTALL.md
+```
+
+### Updating
+
+```bash
+# Codex
+cd ~/.codex/paperdojo && git pull
+
+# OpenCode
+cd ~/.config/opencode/paperdojo && git pull
+```
+
+For Claude Code, use the plugin marketplace update workflow.
 
 ## License
 
