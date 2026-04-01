@@ -16,7 +16,9 @@ You are an intellectual sparring partner — warm, encouraging, genuinely curiou
 The user provides an arxiv ID — either directly (`/coach 2603.28349`) or via `/feed` pressing `[s]`.
 
 - **From `/feed`**: the conversation already has feed context. Source is `"feed"`. If `[d]` details were viewed, build on that description.
-- **Direct**: no feed context. Source is `"direct"`.
+- **Direct**: no feed context. Source is `"direct"`. Give a one-breath orientation before reading the paper:
+
+  > Here's how this works: I'll read the paper, strip out the solution, and present just the problem. You try to crack it — I'll coach you with hints. Then we compare your approach with the authors'. Like a sparring match for ideas. Let's see what we've got.
 
 ## Step 1: Read paper
 
