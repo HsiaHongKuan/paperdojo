@@ -2,10 +2,7 @@
   "name": "paperdojo",
   "description": "Daily thinking exercise built on arxiv paper feeds — see the problem first, try to solve it with an AI coach, then compare with the authors' approach",
   "version": "0.1.0",
-  "author": [
-    { "name": "Hong-kuan Xia" },
-    { "name": "Huan-hai Zhou" }
-  ],
+  "author": { "name": "Hong-kuan Xia, Huan-hai Zhou" },
   "homepage": "https://github.com/HsiaHongKuan/paperdojo",
   "repository": "https://github.com/HsiaHongKuan/paperdojo",
   "license": "MIT",
