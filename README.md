@@ -9,7 +9,8 @@ PaperDojo delivers a daily feed of arxiv papers matched to your interests and tu
 ## Install
 
 ```bash
-claude plugin add --from github HsiaHongKuan/paperdojo
+/plugin marketplace add HsiaHongKuan/paperdojo
+/plugin install paperdojo@paperdojo
 ```
 
 ## Get started
