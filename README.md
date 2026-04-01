@@ -25,6 +25,15 @@ Run `/setup` to tell PaperDojo what you're into. Then `/feed` to browse today's 
 
 After a few sessions, run `/report` to see what's working and where to stretch — it surfaces your reasoning patterns, spots gaps in methodology or formalism, and suggests what to revisit.
 
+## Skills
+
+| Skill | Description |
+|---|---|
+| `/setup` | Configure research interests, coaching preferences, and MCP servers |
+| `/feed` | Browse today's arxiv papers, ranked by your interests, with optional deep-dive into details |
+| `/coach` | Socratic coaching session — work through a paper's problem with guided hints, then compare with the authors |
+| `/report` | Coaching dashboard — activity heatmap, thinking patterns, growth areas, and what to revisit |
+
 ## Dependencies
 
 - **arxiv-latex-mcp** — Reads full paper LaTeX source (equations, proofs, everything). Installed automatically via `/setup`.
