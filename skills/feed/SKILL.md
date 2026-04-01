@@ -20,6 +20,10 @@ Then continue to Step 2.
 
 **If exists and has interests:** continue to Step 2.
 
+### MCP check
+
+Silently check if `arxiv-latex-mcp` and `arxiv-mcp-server` are available. Remember the result — do not re-check or prompt mid-browse. If neither is available and the user later presses `[d]` or `[s]`, use the fallback paths described in those sections.
+
 ## Step 2: Fetch + Rank
 
 Read `.paperdojo/interests.toml` to get the user's interests.
@@ -119,8 +123,14 @@ For each paper, display with **bold** highlighting on key terms that match the u
 
 {abstract with interest-matching terms bolded}
 
-[d] Details  [n] Next  [s] Start /coach  [q] Quit
+[d] Details  [n] Next  [b] Back  [s] Start /coach  [q] Quit
 ```
+
+`[b]` is hidden on the first paper (nothing to go back to).
+
+### On `[b]` (Back)
+
+Re-display the previous paper with full options (`[d]`/`[n]`/`[s]`/`[q]`/`[b]`). If the user takes a different action than before (e.g., `[s]` on a paper previously skipped), find and overwrite that paper's record in the feed JSON. Only goes back one paper — not a full history stack.
 
 ### On `[n]` (Next)
 
@@ -200,7 +210,7 @@ Present the subagent's output in a Unicode box titled "Overview" using box-drawi
 Then re-prompt with:
 
 ```
-[n] Next  [s] Start /coach  [q] Quit
+[n] Next  [b] Back  [s] Start /coach  [q] Quit
 ```
 
 (No `[d]` — details already viewed.)
